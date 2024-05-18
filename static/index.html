@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Prediction</title>
+    <style>
+        body {
+            background: url('static/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #upload-button-label {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #upload-button-label:hover {
+            background-color: #45a049;
+        }
+        #upload-button {
+            display: none;
+        }
+        #image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        #selected-image {
+            max-width: 100%;
+            max-height: 400px;
+            display: none;
+        }
+        #prediction {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Upload Image for Prediction</h1>
+        <label for="upload-button" id="upload-button-label">Choose Image</label>
+        <input type="file" id="upload-button" accept="image/*">
+        <div id="image-container">
+            <img id="selected-image" src="" alt="Selected Image">
+        </div>
+        <div id="prediction"></div>
+    </div>
+
+    <script>
+        const uploadButton = document.getElementById('upload-button');
+        const selectedImage = document.getElementById('selected-image');
+        const predictionDiv = document.getElementById('prediction');
+        const uploadButtonLabel = document.getElementById('upload-button-label');
+
+        uploadButton.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    selectedImage.src = reader.result;
+                    selectedImage.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('http://localhost:8000/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.error) {
+                    predictionDiv.innerText = `Error: ${result.error}`;
+                } else {
+                    predictionDiv.innerText = `Prediction: ${result.class}, Confidence: ${(result.confidence * 100).toFixed(2)}%`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
