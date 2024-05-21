@@ -57,7 +57,7 @@ The application is deployed on an AWS EC2 t3.micro instance. You can test the mo
 ## Usage
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/plant-disease-classification.git
+   git clone https://github.com/omarhassan97/plant-disease-classification.git
    cd plant-disease-classification
 
 2. Install the required dependencies:
